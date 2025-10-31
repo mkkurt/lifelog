@@ -1,0 +1,500 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		3EB963033398E35C90A275C0 /* LifeLogApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 764764D5AC99E18A91135AB4 /* LifeLogApp.swift */; };
+		E8A55A8B2B583F4E72617133 /* Capture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BFF2AEEDD36F46AA5851098 /* Capture.swift */; };
+		220FBB574FC38F1AA8F26165 /* Summary.swift in Sources */ = {isa = PBXBuildFile; fileRef = B78879A78F63334AE13069FD /* Summary.swift */; };
+		820D2DE5518189338DA06D3C /* TextEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24749C9AC2FB8876248A6A02 /* TextEntry.swift */; };
+		C208B7E449F993D563C505C0 /* AIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8615D83F6FFCC3B10EDDCB06 /* AIService.swift */; };
+		7C54FE9690EBBC58451D3903 /* GeminiClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = B775F26C6D65148B02DEADAD /* GeminiClient.swift */; };
+		A1C3F4E5D7E1F9B2A4C6E8D0 /* AppleIntelligenceClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2E4F7B9D1E3A5C7F9B1D3E5 /* AppleIntelligenceClient.swift */; };
+		2117ACF6353BF6108465B255 /* OCRService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD1AAA47B2D0468DD4234760 /* OCRService.swift */; };
+		C5A5FDC7BC406B8673413876 /* PrivacyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB66907442BC2210FC3B0B5B /* PrivacyManager.swift */; };
+		F38B89706C755D22D626DBBB /* ScreenCaptureConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = F18F869446B0C01905D04922 /* ScreenCaptureConfiguration.swift */; };
+		2CBC58FD557D51BDAAD4A324 /* ScreenCaptureService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E360BB0BF494B963C95987FF /* ScreenCaptureService.swift */; };
+		947DA7FC1FCC8D83DA08956E /* StorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01CE074E585BEC8DE41F98F3 /* StorageService.swift */; };
+		7544900B385BA2C452EC3E3E /* MenuBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B406AB77732ADC2EAE6E67E4 /* MenuBarController.swift */; };
+		BB728457DC37CC712796D1B4 /* MenuBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7731E20D173A890C090599E4 /* MenuBarView.swift */; };
+		42E0030A02220733B2E86948 /* QueryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2DF2CBA6AE6DEF9DED18E1A /* QueryView.swift */; };
+		67ADB91A887A20DD8AAD3857 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ABEF26AD18ABEBA19E713E9 /* SettingsView.swift */; };
+		89621CB8618E52C47507E282 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = F21947C80AF9EAEA6B129FF9 /* Logger.swift */; };
+		95833A514B5F74DC7F3EFD21 /* PerformanceMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC7C79C5DB301496A3999919 /* PerformanceMonitor.swift */; };
+		CBDB95BE33BD9521D818CCF0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 44252A77010B0AE70A6ADEC7 /* Assets.xcassets */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		A1000000000000000000001 /* LifeLog.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LifeLog.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		764764D5AC99E18A91135AB4 /* LifeLogApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LifeLogApp.swift; sourceTree = "<group>"; };
+		8BFF2AEEDD36F46AA5851098 /* Capture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Capture.swift; sourceTree = "<group>"; };
+		B78879A78F63334AE13069FD /* Summary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Summary.swift; sourceTree = "<group>"; };
+		24749C9AC2FB8876248A6A02 /* TextEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextEntry.swift; sourceTree = "<group>"; };
+		8615D83F6FFCC3B10EDDCB06 /* AIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIService.swift; sourceTree = "<group>"; };
+		B775F26C6D65148B02DEADAD /* GeminiClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeminiClient.swift; sourceTree = "<group>"; };
+		C2E4F7B9D1E3A5C7F9B1D3E5 /* AppleIntelligenceClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleIntelligenceClient.swift; sourceTree = "<group>"; };
+		FD1AAA47B2D0468DD4234760 /* OCRService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OCRService.swift; sourceTree = "<group>"; };
+		CB66907442BC2210FC3B0B5B /* PrivacyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyManager.swift; sourceTree = "<group>"; };
+		F18F869446B0C01905D04922 /* ScreenCaptureConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenCaptureConfiguration.swift; sourceTree = "<group>"; };
+		E360BB0BF494B963C95987FF /* ScreenCaptureService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenCaptureService.swift; sourceTree = "<group>"; };
+		01CE074E585BEC8DE41F98F3 /* StorageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageService.swift; sourceTree = "<group>"; };
+		B406AB77732ADC2EAE6E67E4 /* MenuBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarController.swift; sourceTree = "<group>"; };
+		7731E20D173A890C090599E4 /* MenuBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarView.swift; sourceTree = "<group>"; };
+		E2DF2CBA6AE6DEF9DED18E1A /* QueryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryView.swift; sourceTree = "<group>"; };
+		5ABEF26AD18ABEBA19E713E9 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		F21947C80AF9EAEA6B129FF9 /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
+		CC7C79C5DB301496A3999919 /* PerformanceMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PerformanceMonitor.swift; sourceTree = "<group>"; };
+		44252A77010B0AE70A6ADEC7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		038476EFEEBBDD151A99D546 /* LifeLog.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LifeLog.entitlements; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A100000A000000000000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A100000B000000000000001 = {
+			isa = PBXGroup;
+			children = (
+				A100000C000000000000001 /* LifeLog */,
+				A100000D000000000000001 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A100000C000000000000001 /* LifeLog */ = {
+			isa = PBXGroup;
+			children = (
+				F1000001000000000000001 /* App */,
+				F1000002000000000000001 /* Models */,
+				F1000003000000000000001 /* Services */,
+				F1000004000000000000001 /* UI */,
+				F1000005000000000000001 /* Utils */,
+				44252A77010B0AE70A6ADEC7 /* Assets.xcassets */,
+				038476EFEEBBDD151A99D546 /* LifeLog.entitlements */,
+			);
+			path = LifeLog;
+			sourceTree = "<group>";
+		};
+		A100000D000000000000001 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A1000000000000000000001 /* LifeLog.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		F1000001000000000000001 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				764764D5AC99E18A91135AB4 /* LifeLogApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		F1000002000000000000001 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				8BFF2AEEDD36F46AA5851098 /* Capture.swift */,
+				B78879A78F63334AE13069FD /* Summary.swift */,
+				24749C9AC2FB8876248A6A02 /* TextEntry.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		F1000003000000000000001 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				F1000006000000000000001 /* AI */,
+				F1000007000000000000001 /* OCR */,
+				F1000008000000000000001 /* Privacy */,
+				F1000009000000000000001 /* ScreenCapture */,
+				F100000A000000000000001 /* Storage */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		F1000004000000000000001 /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				F100000B000000000000001 /* MenuBar */,
+				F100000C000000000000001 /* Query */,
+				F100000D000000000000001 /* Settings */,
+			);
+			path = UI;
+			sourceTree = "<group>";
+		};
+		F1000005000000000000001 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				F21947C80AF9EAEA6B129FF9 /* Logger.swift */,
+				CC7C79C5DB301496A3999919 /* PerformanceMonitor.swift */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
+		F1000006000000000000001 /* AI */ = {
+			isa = PBXGroup;
+			children = (
+				8615D83F6FFCC3B10EDDCB06 /* AIService.swift */,
+				B775F26C6D65148B02DEADAD /* GeminiClient.swift */,
+				C2E4F7B9D1E3A5C7F9B1D3E5 /* AppleIntelligenceClient.swift */,
+			);
+			path = AI;
+			sourceTree = "<group>";
+		};
+		F1000007000000000000001 /* OCR */ = {
+			isa = PBXGroup;
+			children = (
+				FD1AAA47B2D0468DD4234760 /* OCRService.swift */,
+			);
+			path = OCR;
+			sourceTree = "<group>";
+		};
+		F1000008000000000000001 /* Privacy */ = {
+			isa = PBXGroup;
+			children = (
+				CB66907442BC2210FC3B0B5B /* PrivacyManager.swift */,
+			);
+			path = Privacy;
+			sourceTree = "<group>";
+		};
+		F1000009000000000000001 /* ScreenCapture */ = {
+			isa = PBXGroup;
+			children = (
+				F18F869446B0C01905D04922 /* ScreenCaptureConfiguration.swift */,
+				E360BB0BF494B963C95987FF /* ScreenCaptureService.swift */,
+			);
+			path = ScreenCapture;
+			sourceTree = "<group>";
+		};
+		F100000A000000000000001 /* Storage */ = {
+			isa = PBXGroup;
+			children = (
+				01CE074E585BEC8DE41F98F3 /* StorageService.swift */,
+			);
+			path = Storage;
+			sourceTree = "<group>";
+		};
+		F100000B000000000000001 /* MenuBar */ = {
+			isa = PBXGroup;
+			children = (
+				B406AB77732ADC2EAE6E67E4 /* MenuBarController.swift */,
+				7731E20D173A890C090599E4 /* MenuBarView.swift */,
+			);
+			path = MenuBar;
+			sourceTree = "<group>";
+		};
+		F100000C000000000000001 /* Query */ = {
+			isa = PBXGroup;
+			children = (
+				E2DF2CBA6AE6DEF9DED18E1A /* QueryView.swift */,
+			);
+			path = Query;
+			sourceTree = "<group>";
+		};
+		F100000D000000000000001 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				5ABEF26AD18ABEBA19E713E9 /* SettingsView.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A100000E000000000000001 /* LifeLog */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A100000F000000000000001 /* Build configuration list for PBXNativeTarget "LifeLog" */;
+			buildPhases = (
+				A1000010000000000000001 /* Sources */,
+				A100000A000000000000001 /* Frameworks */,
+				A1000011000000000000001 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = LifeLog;
+			productName = LifeLog;
+			productReference = A1000000000000000000001 /* LifeLog.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A1000012000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					A100000E000000000000001 = {
+						CreatedOnToolsVersion = 15.0;
+					};
+				};
+			};
+			buildConfigurationList = A1000013000000000000001 /* Build configuration list for PBXProject "LifeLog" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = A100000B000000000000001;
+			productRefGroup = A100000D000000000000001 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A100000E000000000000001 /* LifeLog */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A1000011000000000000001 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CBDB95BE33BD9521D818CCF0 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A1000010000000000000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3EB963033398E35C90A275C0 /* LifeLogApp.swift in Sources */,
+				E8A55A8B2B583F4E72617133 /* Capture.swift in Sources */,
+				220FBB574FC38F1AA8F26165 /* Summary.swift in Sources */,
+				820D2DE5518189338DA06D3C /* TextEntry.swift in Sources */,
+				C208B7E449F993D563C505C0 /* AIService.swift in Sources */,
+				7C54FE9690EBBC58451D3903 /* GeminiClient.swift in Sources */,
+				A1C3F4E5D7E1F9B2A4C6E8D0 /* AppleIntelligenceClient.swift in Sources */,
+				2117ACF6353BF6108465B255 /* OCRService.swift in Sources */,
+				C5A5FDC7BC406B8673413876 /* PrivacyManager.swift in Sources */,
+				F38B89706C755D22D626DBBB /* ScreenCaptureConfiguration.swift in Sources */,
+				2CBC58FD557D51BDAAD4A324 /* ScreenCaptureService.swift in Sources */,
+				947DA7FC1FCC8D83DA08956E /* StorageService.swift in Sources */,
+				7544900B385BA2C452EC3E3E /* MenuBarController.swift in Sources */,
+				BB728457DC37CC712796D1B4 /* MenuBarView.swift in Sources */,
+				42E0030A02220733B2E86948 /* QueryView.swift in Sources */,
+				67ADB91A887A20DD8AAD3857 /* SettingsView.swift in Sources */,
+				89621CB8618E52C47507E282 /* Logger.swift in Sources */,
+				95833A514B5F74DC7F3EFD21 /* PerformanceMonitor.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		A1000014000000000000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		A1000015000000000000001 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		A1000016000000000000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = LifeLog/LifeLog.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lifelog.LifeLog;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		A1000017000000000000001 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = LifeLog/LifeLog.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lifelog.LifeLog;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A1000013000000000000001 /* Build configuration list for PBXProject "LifeLog" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A1000014000000000000001 /* Debug */,
+				A1000015000000000000001 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A100000F000000000000001 /* Build configuration list for PBXNativeTarget "LifeLog" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A1000016000000000000001 /* Debug */,
+				A1000017000000000000001 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = A1000012000000000000001 /* Project object */;
+}
