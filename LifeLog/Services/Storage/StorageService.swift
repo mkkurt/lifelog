@@ -499,6 +499,62 @@ actor StorageService {
 
     // MARK: - Interaction Events
 
+    func getInteractionEvents(from startTime: Date, to endTime: Date) async -> [InteractionEvent] {
+        let sql = """
+        SELECT id, timestamp, type, app_name, window_title, intensity, session_id, metadata
+        FROM interaction_events
+        WHERE timestamp BETWEEN ? AND ?
+        ORDER BY timestamp ASC
+        """
+
+        var statement: OpaquePointer?
+        guard sqlite3_prepare_v2(db, sql, -1, &statement, nil) == SQLITE_OK else {
+            Logger.error("Failed to prepare interaction events query", log: Logger.storage)
+            return []
+        }
+
+        defer { sqlite3_finalize(statement) }
+
+        sqlite3_bind_int64(statement, 1, Int64(startTime.timeIntervalSince1970))
+        sqlite3_bind_int64(statement, 2, Int64(endTime.timeIntervalSince1970))
+
+        var events: [InteractionEvent] = []
+
+        while sqlite3_step(statement) == SQLITE_ROW {
+            let typeString = String(cString: sqlite3_column_text(statement, 2))
+            guard let type = InteractionType(rawValue: typeString) else { continue }
+
+            let sessionId: Int64? = {
+                let value = sqlite3_column_int64(statement, 6)
+                return value == 0 ? nil : value
+            }()
+
+            let metadataString = sqlite3_column_text(statement, 7).map { String(cString: $0) }
+            let metadata: [String: String]? = {
+                guard let metadataString = metadataString,
+                      let data = metadataString.data(using: .utf8),
+                      let decoded = try? JSONDecoder().decode([String: String].self, from: data) else {
+                    return nil
+                }
+                return decoded
+            }()
+
+            let event = InteractionEvent(
+                id: sqlite3_column_int64(statement, 0),
+                timestamp: Date(timeIntervalSince1970: TimeInterval(sqlite3_column_int64(statement, 1))),
+                type: type,
+                appName: sqlite3_column_text(statement, 3).map { String(cString: $0) },
+                windowTitle: sqlite3_column_text(statement, 4).map { String(cString: $0) },
+                intensity: Int(sqlite3_column_int(statement, 5)),
+                sessionId: sessionId,
+                metadata: metadata
+            )
+            events.append(event)
+        }
+
+        return events
+    }
+
     func saveInteractionEvent(_ event: InteractionEvent) async -> Int64 {
         let sql = """
         INSERT INTO interaction_events (timestamp, type, app_name, window_title, intensity, session_id, metadata)
