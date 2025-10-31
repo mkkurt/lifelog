@@ -597,6 +597,65 @@ actor StorageService {
 
     // MARK: - Features
 
+    func getFeatures(from startTime: Date, to endTime: Date) async -> [Feature] {
+        let sql = """
+        SELECT id, window_start, window_end, session_id, block_length, interruption_rate, circadian_band,
+               topic_label, topic_continuity, topic_churn, repetition_score, task_switch_rate,
+               micro_distraction_count, flow_indicator, grind_indicator, output_density,
+               passive_consumption, active_consumption
+        FROM features
+        WHERE window_start >= ? AND window_end <= ?
+        ORDER BY window_start ASC
+        """
+
+        var statement: OpaquePointer?
+        guard sqlite3_prepare_v2(db, sql, -1, &statement, nil) == SQLITE_OK else {
+            Logger.error("Failed to prepare features query", log: Logger.storage)
+            return []
+        }
+
+        defer { sqlite3_finalize(statement) }
+
+        sqlite3_bind_int64(statement, 1, Int64(startTime.timeIntervalSince1970))
+        sqlite3_bind_int64(statement, 2, Int64(endTime.timeIntervalSince1970))
+
+        var features: [Feature] = []
+
+        while sqlite3_step(statement) == SQLITE_ROW {
+            let circadianString = String(cString: sqlite3_column_text(statement, 6))
+            let circadianBand = CircadianBand(rawValue: circadianString) ?? .unknown
+
+            let sessionId: Int64? = {
+                let value = sqlite3_column_int64(statement, 3)
+                return value == 0 ? nil : value
+            }()
+
+            let feature = Feature(
+                id: sqlite3_column_int64(statement, 0),
+                windowStart: Date(timeIntervalSince1970: TimeInterval(sqlite3_column_int64(statement, 1))),
+                windowEnd: Date(timeIntervalSince1970: TimeInterval(sqlite3_column_int64(statement, 2))),
+                sessionId: sessionId,
+                blockLength: sqlite3_column_double(statement, 4),
+                interruptionRate: sqlite3_column_double(statement, 5),
+                circadianBand: circadianBand,
+                topicLabel: sqlite3_column_text(statement, 7).map { String(cString: $0) },
+                topicContinuity: sqlite3_column_double(statement, 8),
+                topicChurn: sqlite3_column_double(statement, 9),
+                repetitionScore: sqlite3_column_double(statement, 10),
+                taskSwitchRate: sqlite3_column_double(statement, 11),
+                microDistractionCount: Int(sqlite3_column_int(statement, 12)),
+                flowIndicator: sqlite3_column_double(statement, 13),
+                grindIndicator: sqlite3_column_double(statement, 14),
+                outputDensity: sqlite3_column_double(statement, 15),
+                passiveConsumption: sqlite3_column_double(statement, 16),
+                activeConsumption: sqlite3_column_double(statement, 17)
+            )
+            features.append(feature)
+        }
+
+        return features
+    }
+
     func saveFeature(_ feature: Feature) async -> Int64 {
         let sql = """
         INSERT INTO features (window_start, window_end, session_id, block_length, interruption_rate, circadian_band,

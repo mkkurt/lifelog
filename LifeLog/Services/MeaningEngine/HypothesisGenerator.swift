@@ -67,10 +67,7 @@ actor HypothesisGenerator {
     }
 
     private func getRecentFeatures(from startTime: Date, to endTime: Date) async -> [Feature] {
-        // This would query features table
-        // For now, placeholder
-        // TODO: Implement StorageService.getFeatures(from:to:)
-        return []
+        return await StorageService.shared.getFeatures(from: startTime, to: endTime)
     }
 
     // MARK: - Detection Rules
