@@ -11,6 +11,12 @@
 		E8A55A8B2B583F4E72617133 /* Capture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BFF2AEEDD36F46AA5851098 /* Capture.swift */; };
 		220FBB574FC38F1AA8F26165 /* Summary.swift in Sources */ = {isa = PBXBuildFile; fileRef = B78879A78F63334AE13069FD /* Summary.swift */; };
 		820D2DE5518189338DA06D3C /* TextEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24749C9AC2FB8876248A6A02 /* TextEntry.swift */; };
+		F1A2B3C4D5E6F7A8B9C0D1E2 /* InteractionEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A7B8C9D0E1F2 /* InteractionEvent.swift */; };
+		F2A3B4C5D6E7F8A9B0C1D2E3 /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2B3C4D5E6F7A8B9C0D1E2F3 /* Session.swift */; };
+		F3A4B5C6D7E8F9A0B1C2D3E4 /* Feature.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3B4C5D6E7F8A9B0C1D2E3F4 /* Feature.swift */; };
+		F4A5B6C7D8E9F0A1B2C3D4E5 /* Hypothesis.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4B5C6D7E8F9A0B1C2D3E4F5 /* Hypothesis.swift */; };
+		F5A6B7C8D9E0F1A2B3C4D5E6 /* Artifact.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5B6C7D8E9F0A1B2C3D4E5F6 /* Artifact.swift */; };
+		F6A7B8C9D0E1F2A3B4C5D6E7 /* DailyMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6B7C8D9E0F1A2B3C4D5E6F7 /* DailyMetrics.swift */; };
 		C208B7E449F993D563C505C0 /* AIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8615D83F6FFCC3B10EDDCB06 /* AIService.swift */; };
 		7C54FE9690EBBC58451D3903 /* GeminiClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = B775F26C6D65148B02DEADAD /* GeminiClient.swift */; };
 		A1C3F4E5D7E1F9B2A4C6E8D0 /* AppleIntelligenceClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2E4F7B9D1E3A5C7F9B1D3E5 /* AppleIntelligenceClient.swift */; };
@@ -34,6 +40,12 @@
 		8BFF2AEEDD36F46AA5851098 /* Capture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Capture.swift; sourceTree = "<group>"; };
 		B78879A78F63334AE13069FD /* Summary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Summary.swift; sourceTree = "<group>"; };
 		24749C9AC2FB8876248A6A02 /* TextEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextEntry.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6A7B8C9D0E1F2 /* InteractionEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InteractionEvent.swift; sourceTree = "<group>"; };
+		A2B3C4D5E6F7A8B9C0D1E2F3 /* Session.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Session.swift; sourceTree = "<group>"; };
+		A3B4C5D6E7F8A9B0C1D2E3F4 /* Feature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Feature.swift; sourceTree = "<group>"; };
+		A4B5C6D7E8F9A0B1C2D3E4F5 /* Hypothesis.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hypothesis.swift; sourceTree = "<group>"; };
+		A5B6C7D8E9F0A1B2C3D4E5F6 /* Artifact.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Artifact.swift; sourceTree = "<group>"; };
+		A6B7C8D9E0F1A2B3C4D5E6F7 /* DailyMetrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyMetrics.swift; sourceTree = "<group>"; };
 		8615D83F6FFCC3B10EDDCB06 /* AIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIService.swift; sourceTree = "<group>"; };
 		B775F26C6D65148B02DEADAD /* GeminiClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeminiClient.swift; sourceTree = "<group>"; };
 		C2E4F7B9D1E3A5C7F9B1D3E5 /* AppleIntelligenceClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleIntelligenceClient.swift; sourceTree = "<group>"; };
@@ -107,6 +119,12 @@
 				8BFF2AEEDD36F46AA5851098 /* Capture.swift */,
 				B78879A78F63334AE13069FD /* Summary.swift */,
 				24749C9AC2FB8876248A6A02 /* TextEntry.swift */,
+				A1B2C3D4E5F6A7B8C9D0E1F2 /* InteractionEvent.swift */,
+				A2B3C4D5E6F7A8B9C0D1E2F3 /* Session.swift */,
+				A3B4C5D6E7F8A9B0C1D2E3F4 /* Feature.swift */,
+				A4B5C6D7E8F9A0B1C2D3E4F5 /* Hypothesis.swift */,
+				A5B6C7D8E9F0A1B2C3D4E5F6 /* Artifact.swift */,
+				A6B7C8D9E0F1A2B3C4D5E6F7 /* DailyMetrics.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -283,6 +301,12 @@
 				E8A55A8B2B583F4E72617133 /* Capture.swift in Sources */,
 				220FBB574FC38F1AA8F26165 /* Summary.swift in Sources */,
 				820D2DE5518189338DA06D3C /* TextEntry.swift in Sources */,
+				F1A2B3C4D5E6F7A8B9C0D1E2 /* InteractionEvent.swift in Sources */,
+				F2A3B4C5D6E7F8A9B0C1D2E3 /* Session.swift in Sources */,
+				F3A4B5C6D7E8F9A0B1C2D3E4 /* Feature.swift in Sources */,
+				F4A5B6C7D8E9F0A1B2C3D4E5 /* Hypothesis.swift in Sources */,
+				F5A6B7C8D9E0F1A2B3C4D5E6 /* Artifact.swift in Sources */,
+				F6A7B8C9D0E1F2A3B4C5D6E7 /* DailyMetrics.swift in Sources */,
 				C208B7E449F993D563C505C0 /* AIService.swift in Sources */,
 				7C54FE9690EBBC58451D3903 /* GeminiClient.swift in Sources */,
 				A1C3F4E5D7E1F9B2A4C6E8D0 /* AppleIntelligenceClient.swift in Sources */,
