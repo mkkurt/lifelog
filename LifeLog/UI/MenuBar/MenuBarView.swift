@@ -8,6 +8,7 @@ struct MenuBarView: View {
 
     @State private var showingQueryView = false
     @State private var showingSettings = false
+    @State private var showingDailyBrief = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -21,6 +22,8 @@ struct MenuBarView: View {
                 permissionRequiredView
             } else if showingQueryView {
                 QueryView(isPresented: $showingQueryView)
+            } else if showingDailyBrief {
+                DailyBriefView(isPresented: $showingDailyBrief)
             } else {
                 statusView
             }
@@ -190,11 +193,18 @@ struct MenuBarView: View {
                         .font(.headline)
                         .padding(.horizontal)
 
+                    Button(action: { showingDailyBrief = true }) {
+                        Label("View Daily Brief", systemImage: "chart.bar.doc.horizontal")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .padding(.horizontal)
+
                     Button(action: { showingQueryView = true }) {
                         Label("Ask LifeLog a Question", systemImage: "bubble.left.and.bubble.right")
                             .frame(maxWidth: .infinity)
                     }
-                    .buttonStyle(.borderedProminent)
+                    .buttonStyle(.bordered)
                     .padding(.horizontal)
                 }
             }

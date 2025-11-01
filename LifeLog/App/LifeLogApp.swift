@@ -35,13 +35,20 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
             // Check/request permission (this handles both checking and requesting)
             await checkAndRequestPermission()
+
+            // Start Meaning Engine if permission granted
+            if await PrivacyManager.shared.hasScreenRecordingPermission {
+                await MeaningEngine.shared.start()
+                Logger.log("Meaning Engine started", log: Logger.ui)
+            }
         }
     }
 
     func applicationWillTerminate(_ notification: Notification) {
-        // Stop capture before quitting
+        // Stop capture and meaning engine before quitting
         Task {
             await ScreenCaptureService.shared.stopCapture()
+            await MeaningEngine.shared.stop()
         }
     }
 
