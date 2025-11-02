@@ -28,18 +28,20 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         Logger.log("LifeLog started", log: Logger.ui)
 
-        // Check permissions on startup
+        // Check permissions on startup (silently - don't trigger prompts)
         Task {
             // Small delay to ensure UI is ready
             try? await Task.sleep(nanoseconds: 500_000_000) // 0.5 seconds
 
-            // Check/request permission (this handles both checking and requesting)
-            await checkAndRequestPermission()
+            // Check permission status silently (won't show prompt)
+            await PrivacyManager.shared.checkPermissions()
 
             // Start Meaning Engine if permission granted
             if await PrivacyManager.shared.hasScreenRecordingPermission {
                 await MeaningEngine.shared.start()
                 Logger.log("Meaning Engine started", log: Logger.ui)
+            } else {
+                Logger.log("Screen recording permission not granted - Meaning Engine not started", log: Logger.ui)
             }
         }
     }
@@ -49,22 +51,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         Task {
             await ScreenCaptureService.shared.stopCapture()
             await MeaningEngine.shared.stop()
-        }
-    }
-
-    private func checkAndRequestPermission() async {
-        let privacyManager = PrivacyManager.shared
-
-        // This single call both checks and requests permission
-        // If permission is already granted, it succeeds silently
-        // If not granted, it triggers the system prompt
-        let granted = await privacyManager.requestScreenRecordingPermission()
-
-        if !granted {
-            // Permission was denied, show our help alert
-            await MainActor.run {
-                showPermissionAlert()
-            }
         }
     }
 

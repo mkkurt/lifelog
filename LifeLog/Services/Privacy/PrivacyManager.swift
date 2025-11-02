@@ -15,17 +15,21 @@ class PrivacyManager: ObservableObject {
         // Permission will be checked/requested by AppDelegate
     }
 
-    /// Check all required permissions
+    /// Check all required permissions (non-intrusive, doesn't trigger prompts)
     func checkPermissions() async {
         isCheckingPermission = true
         defer { isCheckingPermission = false }
 
-        // Check screen recording permission
+        // Check screen recording permission silently
         await checkScreenRecordingPermission()
+
+        Logger.log("Permission check complete: hasScreenRecording=\(hasScreenRecordingPermission)", log: Logger.privacy)
     }
 
-    /// Request screen recording permission
+    /// Request screen recording permission (shows system prompt if needed)
     func requestScreenRecordingPermission() async -> Bool {
+        Logger.log("Requesting screen recording permission...", log: Logger.privacy)
+
         // Try to get shareable content - this will trigger permission prompt if needed
         // If permission is already granted, this succeeds silently
         do {
@@ -35,13 +39,13 @@ class PrivacyManager: ObservableObject {
             )
 
             hasScreenRecordingPermission = true
-            Logger.log("Screen recording permission granted - found \(content.displays.count) display(s)", log: Logger.privacy)
+            Logger.log("✅ Screen recording permission granted - found \(content.displays.count) display(s)", log: Logger.privacy)
             return true
 
         } catch {
             hasScreenRecordingPermission = false
             let errorDesc = error.localizedDescription
-            Logger.error("Screen recording permission denied or unavailable: \(errorDesc)", log: Logger.privacy)
+            Logger.error("❌ Screen recording permission denied: \(errorDesc)", log: Logger.privacy)
 
             // Log detailed error info
             if let scError = error as? SCStreamError {

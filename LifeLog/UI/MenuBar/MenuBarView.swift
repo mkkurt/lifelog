@@ -86,12 +86,24 @@ struct MenuBarView: View {
                 .padding(.horizontal)
 
             VStack(spacing: 12) {
-                Button("Open System Settings") {
-                    privacyManager.openScreenRecordingSettings()
+                Button("Grant Permission") {
+                    Task {
+                        let granted = await privacyManager.requestScreenRecordingPermission()
+                        if granted {
+                            // Permission granted, start services
+                            try? await screenCapture.startCapture()
+                            await MeaningEngine.shared.start()
+                        }
+                    }
                 }
                 .buttonStyle(.borderedProminent)
 
-                Button("Check Permission Again") {
+                Button("Open System Settings") {
+                    privacyManager.openScreenRecordingSettings()
+                }
+                .buttonStyle(.bordered)
+
+                Button("Refresh Status") {
                     Task {
                         await privacyManager.checkPermissions()
                     }
@@ -99,7 +111,7 @@ struct MenuBarView: View {
                 .buttonStyle(.bordered)
             }
 
-            Text("After granting permission in System Settings, click 'Check Permission Again'.")
+            Text("Click 'Grant Permission' to trigger the system prompt, or manually enable in System Settings and click 'Refresh Status'.")
                 .font(.caption)
                 .foregroundStyle(.tertiary)
                 .multilineTextAlignment(.center)
