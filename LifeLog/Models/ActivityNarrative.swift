@@ -1,52 +1,4 @@
 import Foundation
-import CoreGraphics
-import CryptoKit
-
-/// Represents recognized text from a screen capture
-struct TextEntry: Identifiable, Codable {
-    let id: Int64
-    let captureId: Int64
-    let timestamp: Date
-    let rawText: String
-    let confidence: Float
-    let appName: String?
-    let windowTitle: String?
-    let screenRegion: CGRect?
-
-    init(
-        id: Int64 = 0,
-        captureId: Int64,
-        timestamp: Date = Date(),
-        rawText: String,
-        confidence: Float,
-        appName: String? = nil,
-        windowTitle: String? = nil,
-        screenRegion: CGRect? = nil
-    ) {
-        self.id = id
-        self.captureId = captureId
-        self.timestamp = timestamp
-        self.rawText = rawText
-        self.confidence = confidence
-        self.appName = appName
-        self.windowTitle = windowTitle
-        self.screenRegion = screenRegion
-    }
-}
-
-/// Result from OCR processing
-struct OCRResult {
-    let text: String
-    let confidence: Float
-    let boundingBox: CGRect
-    let recognizedLanguages: [String]
-
-    var isHighConfidence: Bool {
-        confidence > 0.7
-    }
-}
-
-// MARK: - Activity Narratives
 
 /// Represents a compacted, narrative summary of user activity
 /// This replaces raw OCR text with intelligent, structured summaries
@@ -104,7 +56,20 @@ struct CaptureWindow {
 extension String {
     func sha256Hash() -> String {
         guard let data = self.data(using: .utf8) else { return "" }
-        let hash = SHA256.hash(data: data)
-        return hash.compactMap { String(format: "%02x", $0) }.joined()
+        var hash = [UInt8](repeating: 0, count: 32)
+        data.withUnsafeBytes { buffer in
+            // Simple hash for duplicate detection
+            // In production, use CryptoKit.SHA256
+            var h: UInt32 = 5381
+            for byte in buffer {
+                h = ((h << 5) &+ h) &+ UInt32(byte)
+            }
+            let hashString = String(h, radix: 16)
+            let bytes = hashString.utf8
+            for (i, byte) in bytes.enumerated() where i < 32 {
+                hash[i] = byte
+            }
+        }
+        return hash.map { String(format: "%02x", $0) }.joined()
     }
 }

@@ -150,9 +150,13 @@ class OCRService: ObservableObject {
             screenRegion: nil // Could calculate overall bounding box
         )
 
-        // Save to storage
+        // Save raw text entry (for debugging and backup)
+        // Note: Raw entries will be kept for a short time, then cleaned up
         await StorageService.shared.saveTextEntry(textEntry)
 
         Logger.log("Saved text entry: \(combinedText.prefix(50))...", log: Logger.ocr, type: .debug)
+
+        // Note: Data compaction happens in background via DataCompactionService
+        // which batches entries into narratives every 5 minutes
     }
 }

@@ -97,6 +97,47 @@ actor StorageService {
             VALUES (new.id, new.raw_text, new.app_name);
         END;
 
+        -- Activity narratives table (compacted, AI-summarized data)
+        CREATE TABLE IF NOT EXISTS activity_narratives (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            timestamp INTEGER NOT NULL,
+            duration REAL NOT NULL,
+            app_name TEXT NOT NULL,
+            narrative TEXT NOT NULL,
+            actions TEXT,
+            topics TEXT,
+            context_hash TEXT UNIQUE NOT NULL
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_activity_narratives_timestamp ON activity_narratives(timestamp);
+        CREATE INDEX IF NOT EXISTS idx_activity_narratives_app ON activity_narratives(app_name);
+        CREATE INDEX IF NOT EXISTS idx_activity_narratives_hash ON activity_narratives(context_hash);
+
+        -- Full-text search for narratives
+        CREATE VIRTUAL TABLE IF NOT EXISTS activity_narratives_fts USING fts5(
+            narrative,
+            topics,
+            app_name,
+            content=activity_narratives,
+            content_rowid=id
+        );
+
+        -- Triggers for narrative FTS
+        CREATE TRIGGER IF NOT EXISTS activity_narratives_ai AFTER INSERT ON activity_narratives BEGIN
+            INSERT INTO activity_narratives_fts(rowid, narrative, topics, app_name)
+            VALUES (new.id, new.narrative, new.topics, new.app_name);
+        END;
+
+        CREATE TRIGGER IF NOT EXISTS activity_narratives_ad AFTER DELETE ON activity_narratives BEGIN
+            DELETE FROM activity_narratives_fts WHERE rowid = old.id;
+        END;
+
+        CREATE TRIGGER IF NOT EXISTS activity_narratives_au AFTER UPDATE ON activity_narratives BEGIN
+            DELETE FROM activity_narratives_fts WHERE rowid = old.id;
+            INSERT INTO activity_narratives_fts(rowid, narrative, topics, app_name)
+            VALUES (new.id, new.narrative, new.topics, new.app_name);
+        END;
+
         -- Summaries table
         CREATE TABLE IF NOT EXISTS summaries (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -895,6 +936,132 @@ actor StorageService {
             )
         }
         return nil
+    }
+
+    // MARK: - Activity Narratives
+
+    func saveActivityNarrative(_ narrative: ActivityNarrative) async -> Int64 {
+        let sql = """
+        INSERT OR IGNORE INTO activity_narratives (
+            timestamp, duration, app_name, narrative, actions, topics, context_hash
+        ) VALUES (?, ?, ?, ?, ?, ?, ?)
+        """
+
+        var statement: OpaquePointer?
+        guard sqlite3_prepare_v2(db, sql, -1, &statement, nil) == SQLITE_OK else {
+            Logger.error("Failed to prepare activity narrative insert", log: Logger.storage)
+            return 0
+        }
+        defer { sqlite3_finalize(statement) }
+
+        sqlite3_bind_int64(statement, 1, Int64(narrative.timestamp.timeIntervalSince1970))
+        sqlite3_bind_double(statement, 2, narrative.duration)
+        sqlite3_bind_text(statement, 3, (narrative.appName as NSString).utf8String, -1, nil)
+        sqlite3_bind_text(statement, 4, (narrative.narrative as NSString).utf8String, -1, nil)
+        sqlite3_bind_text(statement, 5, (narrative.actions.joined(separator: ",") as NSString).utf8String, -1, nil)
+        sqlite3_bind_text(statement, 6, (narrative.topics.joined(separator: ",") as NSString).utf8String, -1, nil)
+        sqlite3_bind_text(statement, 7, (narrative.contextHash as NSString).utf8String, -1, nil)
+
+        if sqlite3_step(statement) == SQLITE_DONE {
+            return sqlite3_last_insert_rowid(db)
+        } else {
+            let error = String(cString: sqlite3_errmsg(db))
+            // Ignore duplicate hash errors (already processed)
+            if !error.contains("UNIQUE constraint") {
+                Logger.error("Failed to save activity narrative: \(error)", log: Logger.storage)
+            }
+            return 0
+        }
+    }
+
+    func getNarrativesBetween(start: Date, end: Date) async -> [ActivityNarrative] {
+        let sql = """
+        SELECT id, timestamp, duration, app_name, narrative, actions, topics, context_hash
+        FROM activity_narratives
+        WHERE timestamp >= ? AND timestamp <= ?
+        ORDER BY timestamp DESC
+        """
+
+        var statement: OpaquePointer?
+        guard sqlite3_prepare_v2(db, sql, -1, &statement, nil) == SQLITE_OK else { return [] }
+        defer { sqlite3_finalize(statement) }
+
+        sqlite3_bind_int64(statement, 1, Int64(start.timeIntervalSince1970))
+        sqlite3_bind_int64(statement, 2, Int64(end.timeIntervalSince1970))
+
+        var narratives: [ActivityNarrative] = []
+        while sqlite3_step(statement) == SQLITE_ROW {
+            let id = sqlite3_column_int64(statement, 0)
+            let timestamp = Date(timeIntervalSince1970: TimeInterval(sqlite3_column_int64(statement, 1)))
+            let duration = sqlite3_column_double(statement, 2)
+            let appName = String(cString: sqlite3_column_text(statement, 3))
+            let narrative = String(cString: sqlite3_column_text(statement, 4))
+            let actionsText = String(cString: sqlite3_column_text(statement, 5))
+            let topicsText = String(cString: sqlite3_column_text(statement, 6))
+            let contextHash = String(cString: sqlite3_column_text(statement, 7))
+
+            let actions = actionsText.isEmpty ? [] : actionsText.components(separatedBy: ",")
+            let topics = topicsText.isEmpty ? [] : topicsText.components(separatedBy: ",")
+
+            narratives.append(ActivityNarrative(
+                id: id,
+                timestamp: timestamp,
+                duration: duration,
+                appName: appName,
+                narrative: narrative,
+                actions: actions,
+                topics: topics,
+                contextHash: contextHash
+            ))
+        }
+
+        return narratives
+    }
+
+    func searchNarratives(_ query: String, limit: Int = 50) async -> [ActivityNarrative] {
+        let sql = """
+        SELECT an.id, an.timestamp, an.duration, an.app_name, an.narrative, an.actions, an.topics, an.context_hash
+        FROM activity_narratives an
+        JOIN activity_narratives_fts fts ON an.id = fts.rowid
+        WHERE activity_narratives_fts MATCH ?
+        ORDER BY rank
+        LIMIT ?
+        """
+
+        var statement: OpaquePointer?
+        guard sqlite3_prepare_v2(db, sql, -1, &statement, nil) == SQLITE_OK else { return [] }
+        defer { sqlite3_finalize(statement) }
+
+        sqlite3_bind_text(statement, 1, (query as NSString).utf8String, -1, nil)
+        sqlite3_bind_int(statement, 2, Int32(limit))
+
+        var narratives: [ActivityNarrative] = []
+        while sqlite3_step(statement) == SQLITE_ROW {
+            let id = sqlite3_column_int64(statement, 0)
+            let timestamp = Date(timeIntervalSince1970: TimeInterval(sqlite3_column_int64(statement, 1)))
+            let duration = sqlite3_column_double(statement, 2)
+            let appName = String(cString: sqlite3_column_text(statement, 3))
+            let narrative = String(cString: sqlite3_column_text(statement, 4))
+            let actionsText = String(cString: sqlite3_column_text(statement, 5))
+            let topicsText = String(cString: sqlite3_column_text(statement, 6))
+            let contextHash = String(cString: sqlite3_column_text(statement, 7))
+
+            let actions = actionsText.isEmpty ? [] : actionsText.components(separatedBy: ",")
+            let topics = topicsText.isEmpty ? [] : topicsText.components(separatedBy: ",")
+
+            narratives.append(ActivityNarrative(
+                id: id,
+                timestamp: timestamp,
+                duration: duration,
+                appName: appName,
+                narrative: narrative,
+                actions: actions,
+                topics: topics,
+                contextHash: contextHash
+            ))
+        }
+
+        return narratives
     }
 
     deinit {

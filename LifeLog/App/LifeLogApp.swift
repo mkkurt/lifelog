@@ -36,21 +36,26 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             // Check permission status silently (won't show prompt)
             await PrivacyManager.shared.checkPermissions()
 
-            // Start Meaning Engine if permission granted
+            // Start Meaning Engine and Data Compaction if permission granted
             if await PrivacyManager.shared.hasScreenRecordingPermission {
                 await MeaningEngine.shared.start()
                 Logger.log("Meaning Engine started", log: Logger.ui)
+
+                // Start data compaction service for intelligent summarization
+                await DataCompactionService.shared.startCompaction()
+                Logger.log("Data Compaction Service started", log: Logger.ui)
             } else {
-                Logger.log("Screen recording permission not granted - Meaning Engine not started", log: Logger.ui)
+                Logger.log("Screen recording permission not granted - services not started", log: Logger.ui)
             }
         }
     }
 
     func applicationWillTerminate(_ notification: Notification) {
-        // Stop capture and meaning engine before quitting
+        // Stop all services before quitting
         Task {
             await ScreenCaptureService.shared.stopCapture()
             await MeaningEngine.shared.stop()
+            await DataCompactionService.shared.stopCompaction()
         }
     }
 

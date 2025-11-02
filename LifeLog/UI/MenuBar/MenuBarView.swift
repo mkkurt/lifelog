@@ -102,9 +102,10 @@ struct MenuBarView: View {
                         Task {
                             let granted = await privacyManager.requestScreenRecordingPermission()
                             if granted {
-                                // Permission granted, start services
+                                // Permission granted, start all services
                                 try? await screenCapture.startCapture()
                                 await MeaningEngine.shared.start()
+                                await DataCompactionService.shared.startCompaction()
                             }
                         }
                     }
@@ -121,10 +122,11 @@ struct MenuBarView: View {
                                 try? await Task.sleep(nanoseconds: 1_000_000_000)
                                 await privacyManager.checkPermissions()
 
-                                // If permission granted, start services and break
+                                // If permission granted, start all services and break
                                 if privacyManager.hasScreenRecordingPermission {
                                     try? await screenCapture.startCapture()
                                     await MeaningEngine.shared.start()
+                                    await DataCompactionService.shared.startCompaction()
                                     break
                                 }
                             }
@@ -137,10 +139,11 @@ struct MenuBarView: View {
                         Task {
                             await privacyManager.checkPermissions()
 
-                            // Auto-start recording if permission is now granted
+                            // Auto-start all services if permission is now granted
                             if privacyManager.hasScreenRecordingPermission && !screenCapture.isCapturing {
                                 try? await screenCapture.startCapture()
                                 await MeaningEngine.shared.start()
+                                await DataCompactionService.shared.startCompaction()
                             }
                         }
                     }
