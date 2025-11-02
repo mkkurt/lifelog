@@ -164,8 +164,10 @@ class ScreenCaptureService: ObservableObject {
                 imagePath: capture.imagePath
             )
 
-            lastCaptureTime = Date()
-            PerformanceMonitor.shared.recordCapture()
+            await MainActor.run {
+                lastCaptureTime = Date()
+                PerformanceMonitor.shared.recordCapture()
+            }
 
             // Send to OCR service for processing
             await OCRService.shared.processCapture(image: image, capture: captureWithId, context: context)

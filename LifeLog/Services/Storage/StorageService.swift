@@ -240,14 +240,11 @@ actor StorageService {
         CREATE INDEX IF NOT EXISTS idx_daily_metrics_date ON daily_metrics(date);
         """
 
-        for statement in schema.components(separatedBy: ";") {
-            let trimmed = statement.trimmingCharacters(in: .whitespacesAndNewlines)
-            guard !trimmed.isEmpty else { continue }
-
-            if sqlite3_exec(db, trimmed, nil, nil, nil) != SQLITE_OK {
-                let error = String(cString: sqlite3_errmsg(db))
-                Logger.error("SQL error: \(error)", log: Logger.storage)
-            }
+        // Execute entire schema at once since SQLite can handle multiple statements
+        // and this preserves trigger definitions with internal semicolons
+        if sqlite3_exec(db, schema, nil, nil, nil) != SQLITE_OK {
+            let error = String(cString: sqlite3_errmsg(db))
+            Logger.error("SQL error during schema initialization: \(error)", log: Logger.storage)
         }
 
         Logger.log("Database schema initialized", log: Logger.storage)

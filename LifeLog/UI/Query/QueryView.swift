@@ -11,7 +11,7 @@ struct QueryView: View {
     var body: some View {
         VStack(spacing: 0) {
             // Header
-            HStack {
+            HStack(spacing: 12) {
                 Button(action: { isPresented = false }) {
                     Image(systemName: "chevron.left")
                 }
@@ -19,6 +19,7 @@ struct QueryView: View {
 
                 Text("Ask LifeLog")
                     .font(.headline)
+                    .fontWeight(.bold)
 
                 Spacer()
             }
@@ -27,7 +28,7 @@ struct QueryView: View {
 
             Divider()
 
-            // Content
+            // Scrollable content
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     // Input area
@@ -40,17 +41,22 @@ struct QueryView: View {
                             TextField("e.g., What was I working on this morning?", text: $query, axis: .vertical)
                                 .textFieldStyle(.plain)
                                 .lineLimit(2...5)
-                                .padding(8)
+                                .padding(10)
                                 .background(Color(NSColor.textBackgroundColor))
-                                .cornerRadius(6)
+                                .cornerRadius(8)
+                                .onSubmit {
+                                    performQuery()
+                                }
 
                             Button(action: performQuery) {
                                 if isLoading {
                                     ProgressView()
                                         .controlSize(.small)
+                                        .frame(width: 32, height: 32)
                                 } else {
                                     Image(systemName: "arrow.up.circle.fill")
                                         .font(.title2)
+                                        .foregroundColor(query.isEmpty ? .secondary : .accentColor)
                                 }
                             }
                             .buttonStyle(.plain)
@@ -75,7 +81,8 @@ struct QueryView: View {
     private var suggestionsView: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Try asking:")
-                .font(.caption)
+                .font(.subheadline)
+                .fontWeight(.medium)
                 .foregroundColor(.secondary)
 
             ForEach(querySuggestions, id: \.self) { suggestion in
@@ -83,21 +90,27 @@ struct QueryView: View {
                     query = suggestion
                     performQuery()
                 }) {
-                    HStack {
-                        Image(systemName: "lightbulb")
+                    HStack(alignment: .top, spacing: 10) {
+                        Image(systemName: "lightbulb.fill")
                             .foregroundColor(.orange)
+                            .font(.subheadline)
+
                         Text(suggestion)
+                            .font(.subheadline)
                             .foregroundColor(.primary)
-                        Spacer()
+                            .multilineTextAlignment(.leading)
+                            .fixedSize(horizontal: false, vertical: true)
+
+                        Spacer(minLength: 0)
                     }
-                    .padding(10)
+                    .padding(12)
                     .background(Color(NSColor.controlBackgroundColor))
-                    .cornerRadius(6)
+                    .cornerRadius(8)
                 }
                 .buttonStyle(.plain)
             }
         }
-        .padding(.top)
+        .padding(.top, 8)
     }
 
     private let querySuggestions = [
@@ -132,33 +145,47 @@ struct ResponseView: View {
     let response: QueryResponse
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 16) {
             // Response text
-            VStack(alignment: .leading, spacing: 8) {
-                HStack {
+            VStack(alignment: .leading, spacing: 10) {
+                HStack(spacing: 8) {
                     Image(systemName: "brain.head.profile")
                         .foregroundColor(.blue)
+                        .font(.headline)
+
                     Text("Answer")
                         .font(.headline)
+                        .fontWeight(.semibold)
                 }
 
                 Text(response.response)
                     .font(.body)
+                    .lineSpacing(4)
                     .textSelection(.enabled)
+                    .fixedSize(horizontal: false, vertical: true)
             }
-            .padding()
-            .background(Color.blue.opacity(0.1))
+            .padding(16)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color.blue.opacity(0.08))
             .cornerRadius(10)
 
             // Relevant entries
             if !response.relevantEntries.isEmpty {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Based on \(response.relevantEntries.count) relevant entries")
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("Based on \(response.relevantEntries.count) relevant \(response.relevantEntries.count == 1 ? "entry" : "entries")")
                         .font(.caption)
+                        .fontWeight(.medium)
                         .foregroundColor(.secondary)
 
                     ForEach(response.relevantEntries.prefix(3)) { entry in
                         EntryPreview(entry: entry)
+                    }
+
+                    if response.relevantEntries.count > 3 {
+                        Text("+ \(response.relevantEntries.count - 3) more")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .padding(.horizontal, 8)
                     }
                 }
             }
@@ -172,13 +199,19 @@ struct EntryPreview: View {
     let entry: TextEntry
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 6) {
             HStack {
                 if let appName = entry.appName {
-                    Text(appName)
-                        .font(.caption)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.blue)
+                    HStack(spacing: 4) {
+                        Image(systemName: "app.fill")
+                            .font(.caption2)
+                            .foregroundColor(.blue)
+
+                        Text(appName)
+                            .font(.caption)
+                            .fontWeight(.medium)
+                            .foregroundColor(.blue)
+                    }
                 }
 
                 Spacer()
@@ -192,10 +225,12 @@ struct EntryPreview: View {
                 .font(.caption)
                 .lineLimit(2)
                 .foregroundColor(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
         }
-        .padding(8)
+        .padding(10)
+        .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color(NSColor.controlBackgroundColor))
-        .cornerRadius(6)
+        .cornerRadius(8)
     }
 }
 

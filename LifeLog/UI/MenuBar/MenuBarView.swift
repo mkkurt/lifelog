@@ -12,26 +12,31 @@ struct MenuBarView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // Header
-            headerView
-
-            Divider()
-
-            // Main content
-            if !privacyManager.hasScreenRecordingPermission {
-                permissionRequiredView
-            } else if showingQueryView {
-                QueryView(isPresented: $showingQueryView)
-            } else if showingDailyBrief {
-                DailyBriefView(isPresented: $showingDailyBrief)
-            } else {
-                statusView
+            // Only show header when on main status view
+            if !showingQueryView && !showingDailyBrief {
+                headerView
+                Divider()
             }
 
-            Divider()
+            // Main content
+            Group {
+                if !privacyManager.hasScreenRecordingPermission {
+                    permissionRequiredView
+                } else if showingQueryView {
+                    QueryView(isPresented: $showingQueryView)
+                } else if showingDailyBrief {
+                    DailyBriefView(isPresented: $showingDailyBrief)
+                } else {
+                    statusView
+                }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-            // Footer with actions
-            footerView
+            // Only show footer on main status view
+            if !showingQueryView && !showingDailyBrief && privacyManager.hasScreenRecordingPermission {
+                Divider()
+                footerView
+            }
         }
         .frame(width: 400, height: 500)
     }
@@ -56,7 +61,7 @@ struct MenuBarView: View {
                     Circle()
                         .fill(Color.red)
                         .frame(width: 8, height: 8)
-                        .blinking()
+                        .modifier(BlinkingModifier(isEnabled: true))
 
                     Text("Recording")
                         .font(.caption)
@@ -71,157 +76,191 @@ struct MenuBarView: View {
     // MARK: - Permission Required
 
     private var permissionRequiredView: some View {
-        VStack(spacing: 20) {
-            Image(systemName: "exclamationmark.shield.fill")
-                .font(.system(size: 60))
-                .foregroundColor(.orange)
+        ScrollView {
+            VStack(spacing: 20) {
+                Spacer(minLength: 20)
 
-            Text("Permission Required")
-                .font(.title2)
-                .fontWeight(.semibold)
+                Image(systemName: "exclamationmark.shield.fill")
+                    .font(.system(size: 52))
+                    .foregroundColor(.orange)
 
-            Text("LifeLog needs screen recording permission to capture and analyze your screen.")
-                .multilineTextAlignment(.center)
-                .foregroundColor(.secondary)
-                .padding(.horizontal)
+                VStack(spacing: 8) {
+                    Text("Permission Required")
+                        .font(.title3)
+                        .fontWeight(.semibold)
 
-            VStack(spacing: 12) {
-                Button("Grant Permission") {
-                    Task {
-                        let granted = await privacyManager.requestScreenRecordingPermission()
-                        if granted {
-                            // Permission granted, start services
-                            try? await screenCapture.startCapture()
-                            await MeaningEngine.shared.start()
+                    Text("LifeLog needs screen recording permission to capture and analyze your screen.")
+                        .font(.subheadline)
+                        .multilineTextAlignment(.center)
+                        .foregroundColor(.secondary)
+                        .padding(.horizontal, 24)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                VStack(spacing: 10) {
+                    Button("Grant Permission") {
+                        Task {
+                            let granted = await privacyManager.requestScreenRecordingPermission()
+                            if granted {
+                                // Permission granted, start services
+                                try? await screenCapture.startCapture()
+                                await MeaningEngine.shared.start()
+                            }
                         }
                     }
-                }
-                .buttonStyle(.borderedProminent)
+                    .buttonStyle(.borderedProminent)
+                    .frame(maxWidth: 200)
 
-                Button("Open System Settings") {
-                    privacyManager.openScreenRecordingSettings()
-                }
-                .buttonStyle(.bordered)
+                    Button("Open System Settings") {
+                        privacyManager.openScreenRecordingSettings()
 
-                Button("Refresh Status") {
-                    Task {
-                        await privacyManager.checkPermissions()
+                        // Start polling for permission changes
+                        Task {
+                            // Poll every 1 second for up to 60 seconds
+                            for _ in 0..<60 {
+                                try? await Task.sleep(nanoseconds: 1_000_000_000)
+                                await privacyManager.checkPermissions()
+
+                                // If permission granted, start services and break
+                                if privacyManager.hasScreenRecordingPermission {
+                                    try? await screenCapture.startCapture()
+                                    await MeaningEngine.shared.start()
+                                    break
+                                }
+                            }
+                        }
                     }
-                }
-                .buttonStyle(.bordered)
-            }
+                    .buttonStyle(.bordered)
+                    .frame(maxWidth: 200)
 
-            Text("Click 'Grant Permission' to trigger the system prompt, or manually enable in System Settings and click 'Refresh Status'.")
-                .font(.caption)
-                .foregroundStyle(.tertiary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal)
+                    Button("Refresh Status") {
+                        Task {
+                            await privacyManager.checkPermissions()
+
+                            // Auto-start recording if permission is now granted
+                            if privacyManager.hasScreenRecordingPermission && !screenCapture.isCapturing {
+                                try? await screenCapture.startCapture()
+                                await MeaningEngine.shared.start()
+                            }
+                        }
+                    }
+                    .buttonStyle(.bordered)
+                    .frame(maxWidth: 200)
+                }
+                .padding(.vertical, 8)
+
+                Text("Click 'Grant Permission' to trigger the system prompt, or manually enable in System Settings and click 'Refresh Status'.")
+                    .font(.caption)
+                    .foregroundStyle(.tertiary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 24)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                Spacer(minLength: 20)
+            }
+            .padding()
+            .frame(maxWidth: .infinity)
         }
-        .padding()
-        .frame(maxHeight: .infinity)
     }
 
     // MARK: - Status View
 
     private var statusView: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                // Status cards
-                StatusCard(
-                    title: "Capture Status",
-                    icon: "camera.circle.fill",
-                    color: screenCapture.isCapturing ? .green : .gray
-                ) {
-                    VStack(alignment: .leading, spacing: 8) {
-                        HStack {
-                            Text("Status:")
-                            Spacer()
-                            Text(screenCapture.isCapturing ? "Active" : "Stopped")
-                                .fontWeight(.semibold)
-                                .foregroundColor(screenCapture.isCapturing ? .green : .secondary)
-                        }
+            VStack(spacing: 16) {
+                // Recording status banner
+                recordingStatusBanner
 
-                        if let lastCapture = screenCapture.lastCaptureTime {
-                            HStack {
-                                Text("Last capture:")
-                                Spacer()
-                                Text(lastCapture, style: .relative)
-                                    .foregroundColor(.secondary)
-                            }
-                        }
+                // Quick action cards
+                HStack(spacing: 12) {
+                    QuickActionCard(
+                        icon: "brain.head.profile",
+                        title: "Ask a Question",
+                        subtitle: "Query your activity",
+                        color: .blue,
+                        action: { showingQueryView = true }
+                    )
 
-                        HStack {
-                            Text("Rate:")
-                            Spacer()
-                            Text("\(performanceMonitor.capturesPerMinute)/min")
-                                .foregroundColor(.secondary)
-                        }
-                    }
-                    .font(.subheadline)
+                    QuickActionCard(
+                        icon: "chart.bar.doc.horizontal",
+                        title: "Daily Brief",
+                        subtitle: "View insights",
+                        color: .purple,
+                        action: { showingDailyBrief = true }
+                    )
                 }
+                .padding(.horizontal)
 
-                StatusCard(
-                    title: "OCR Processing",
-                    icon: "doc.text.magnifyingglass",
-                    color: .blue
-                ) {
-                    VStack(alignment: .leading, spacing: 8) {
-                        HStack {
-                            Text("Queue:")
-                            Spacer()
-                            Text("\(ocrService.pendingCount) items")
-                                .foregroundColor(.secondary)
-                        }
-
-                        HStack {
-                            Text("Avg time:")
-                            Spacer()
-                            Text(String(format: "%.2fs", performanceMonitor.ocrProcessingTime))
-                                .foregroundColor(.secondary)
-                        }
-                    }
-                    .font(.subheadline)
-                }
-
-                StatusCard(
-                    title: "Performance",
-                    icon: "gauge.high",
-                    color: .purple
-                ) {
-                    VStack(alignment: .leading, spacing: 8) {
-                        HStack {
-                            Text("Memory:")
-                            Spacer()
-                            Text(String(format: "%.1f MB", performanceMonitor.memoryUsage))
-                                .foregroundColor(.secondary)
-                        }
-                    }
-                    .font(.subheadline)
-                }
-
-                // Quick actions
+                // Today's activity summary
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("Quick Actions")
-                        .font(.headline)
-                        .padding(.horizontal)
-
-                    Button(action: { showingDailyBrief = true }) {
-                        Label("View Daily Brief", systemImage: "chart.bar.doc.horizontal")
-                            .frame(maxWidth: .infinity)
+                    HStack {
+                        Image(systemName: "calendar.circle.fill")
+                            .foregroundColor(.orange)
+                        Text("Today's Activity")
+                            .font(.headline)
+                        Spacer()
                     }
-                    .buttonStyle(.borderedProminent)
-                    .padding(.horizontal)
 
-                    Button(action: { showingQueryView = true }) {
-                        Label("Ask LifeLog a Question", systemImage: "bubble.left.and.bubble.right")
-                            .frame(maxWidth: .infinity)
+                    VStack(spacing: 8) {
+                        if let lastCapture = screenCapture.lastCaptureTime {
+                            ActivityRow(
+                                icon: "camera.fill",
+                                label: "Last captured",
+                                value: lastCapture.formatted(.relative(presentation: .named))
+                            )
+                        }
+
+                        ActivityRow(
+                            icon: "text.magnifyingglass",
+                            label: "OCR queue",
+                            value: ocrService.pendingCount == 0 ? "Up to date" : "\(ocrService.pendingCount) pending"
+                        )
+
+                        ActivityRow(
+                            icon: "memorychip",
+                            label: "Memory usage",
+                            value: String(format: "%.0f MB", performanceMonitor.memoryUsage)
+                        )
                     }
-                    .buttonStyle(.bordered)
-                    .padding(.horizontal)
                 }
+                .padding()
+                .background(Color(NSColor.controlBackgroundColor))
+                .cornerRadius(10)
+                .padding(.horizontal)
+
+                Spacer()
             }
-            .padding()
+            .padding(.vertical)
         }
+    }
+
+    private var recordingStatusBanner: some View {
+        HStack(spacing: 12) {
+            Image(systemName: screenCapture.isCapturing ? "record.circle.fill" : "record.circle")
+                .font(.title)
+                .foregroundColor(screenCapture.isCapturing ? .red : .secondary)
+                .modifier(BlinkingModifier(isEnabled: screenCapture.isCapturing))
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(screenCapture.isCapturing ? "Recording Active" : "Recording Paused")
+                    .font(.headline)
+                    .foregroundColor(screenCapture.isCapturing ? .primary : .secondary)
+
+                Text(screenCapture.isCapturing
+                     ? "Capturing \(performanceMonitor.capturesPerMinute) times/min"
+                     : "Tap Start to begin recording")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+
+            Spacer()
+        }
+        .padding()
+        .background(screenCapture.isCapturing
+                    ? Color.green.opacity(0.1)
+                    : Color(NSColor.controlBackgroundColor))
+        .cornerRadius(10)
+        .padding(.horizontal)
     }
 
     // MARK: - Footer
@@ -268,50 +307,84 @@ struct MenuBarView: View {
     }
 }
 
-// MARK: - Status Card
+// MARK: - Supporting Views
 
-struct StatusCard<Content: View>: View {
-    let title: String
+struct QuickActionCard: View {
     let icon: String
+    let title: String
+    let subtitle: String
     let color: Color
-    @ViewBuilder let content: Content
+    let action: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
+        Button(action: action) {
+            VStack(spacing: 10) {
                 Image(systemName: icon)
+                    .font(.system(size: 32))
                     .foregroundColor(color)
-                Text(title)
-                    .font(.headline)
-                Spacer()
-            }
 
-            content
+                VStack(spacing: 4) {
+                    Text(title)
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.primary)
+
+                    Text(subtitle)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 20)
+            .background(Color(NSColor.controlBackgroundColor))
+            .cornerRadius(10)
         }
-        .padding()
-        .background(Color(NSColor.controlBackgroundColor))
-        .cornerRadius(10)
+        .buttonStyle(.plain)
+    }
+}
+
+struct ActivityRow: View {
+    let icon: String
+    let label: String
+    let value: String
+
+    var body: some View {
+        HStack(spacing: 10) {
+            Image(systemName: icon)
+                .font(.caption)
+                .foregroundColor(.secondary)
+                .frame(width: 20)
+
+            Text(label)
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+
+            Spacer()
+
+            Text(value)
+                .font(.subheadline)
+                .fontWeight(.medium)
+                .foregroundColor(.primary)
+        }
     }
 }
 
 // MARK: - Blinking Animation
 
 struct BlinkingModifier: ViewModifier {
+    let isEnabled: Bool
     @State private var isBlinking = false
 
     func body(content: Content) -> some View {
         content
-            .opacity(isBlinking ? 0.3 : 1.0)
-            .animation(.easeInOut(duration: 0.8).repeatForever(autoreverses: true), value: isBlinking)
-            .onAppear {
-                isBlinking = true
+            .opacity(isEnabled && isBlinking ? 0.3 : 1.0)
+            .animation(isEnabled ? .easeInOut(duration: 0.8).repeatForever(autoreverses: true) : .default, value: isBlinking)
+            .onChange(of: isEnabled) { _, newValue in
+                isBlinking = newValue
             }
-    }
-}
-
-extension View {
-    func blinking() -> some View {
-        modifier(BlinkingModifier())
+            .onAppear {
+                isBlinking = isEnabled
+            }
     }
 }
 

@@ -33,8 +33,8 @@ class AIService: ObservableObject {
            let backend = AIBackend(rawValue: savedBackend) {
             self.preferredBackend = backend
         } else {
-            // Default to Apple Intelligence if available, otherwise Gemini
-            self.preferredBackend = appleIntelligenceClient != nil ? .appleIntelligence : .gemini
+            // Default to Gemini (cloud-based, more reliable)
+            self.preferredBackend = .gemini
         }
     }
 

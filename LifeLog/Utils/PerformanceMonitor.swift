@@ -1,6 +1,7 @@
 import Foundation
 
 /// Monitors app performance metrics
+@MainActor
 class PerformanceMonitor: ObservableObject {
     static let shared = PerformanceMonitor()
 
@@ -18,7 +19,9 @@ class PerformanceMonitor: ObservableObject {
 
     func startMonitoring() {
         monitorTimer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true) { [weak self] _ in
-            self?.updateMetrics()
+            Task { @MainActor in
+                self?.updateMetrics()
+            }
         }
     }
 

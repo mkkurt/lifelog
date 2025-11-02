@@ -247,6 +247,8 @@ actor FeatureExtractor {
         // Count rapid app switches (< 30 seconds apart)
         let appSwitches = events.filter { $0.type == .appSwitch }.sorted { $0.timestamp < $1.timestamp }
 
+        guard appSwitches.count > 1 else { return 0 }
+
         var distractions = 0
         for i in 0..<(appSwitches.count - 1) {
             let timeBetween = appSwitches[i + 1].timestamp.timeIntervalSince(appSwitches[i].timestamp)

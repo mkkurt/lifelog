@@ -11,22 +11,30 @@ struct DailyBriefView: View {
     }
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                // Header
-                headerView
+        VStack(spacing: 0) {
+            // Header
+            headerView
+                .padding()
+                .background(Color(NSColor.controlBackgroundColor))
 
-                if isLoading {
-                    loadingView
-                } else if let brief = dailyBrief {
-                    briefContentView(brief: brief)
-                } else {
-                    emptyStateView
+            Divider()
+
+            // Scrollable content
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    if isLoading {
+                        loadingView
+                            .frame(maxHeight: .infinity)
+                    } else if let brief = dailyBrief {
+                        briefContentView(brief: brief)
+                    } else {
+                        emptyStateView
+                            .frame(maxHeight: .infinity)
+                    }
                 }
+                .padding()
             }
-            .padding()
         }
-        .frame(width: 400, height: 600)
         .task {
             await loadDailyBrief()
         }
@@ -35,19 +43,19 @@ struct DailyBriefView: View {
     // MARK: - Header
 
     private var headerView: some View {
-        HStack {
+        HStack(spacing: 12) {
             Button(action: { isPresented = false }) {
                 Image(systemName: "chevron.left")
             }
-            .buttonStyle(.bordered)
+            .buttonStyle(.plain)
 
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: 2) {
                 Text("Daily Brief")
-                    .font(.title2)
+                    .font(.headline)
                     .fontWeight(.bold)
 
                 Text(Date(), style: .date)
-                    .font(.subheadline)
+                    .font(.caption)
                     .foregroundColor(.secondary)
             }
 
@@ -56,7 +64,7 @@ struct DailyBriefView: View {
             Button(action: { Task { await loadDailyBrief() } }) {
                 Image(systemName: "arrow.clockwise")
             }
-            .buttonStyle(.bordered)
+            .buttonStyle(.plain)
         }
     }
 
@@ -68,9 +76,11 @@ struct DailyBriefView: View {
                 .scaleEffect(1.2)
 
             Text("Calculating daily metrics...")
+                .font(.subheadline)
                 .foregroundColor(.secondary)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 40)
     }
 
     // MARK: - Empty State
@@ -78,18 +88,20 @@ struct DailyBriefView: View {
     private var emptyStateView: some View {
         VStack(spacing: 16) {
             Image(systemName: "chart.line.uptrend.xyaxis")
-                .font(.system(size: 50))
+                .font(.system(size: 48))
                 .foregroundColor(.secondary)
 
             Text("No Activity Yet")
                 .font(.headline)
 
             Text("Start using your computer and LifeLog will build your daily brief.")
+                .font(.subheadline)
                 .multilineTextAlignment(.center)
                 .foregroundColor(.secondary)
-                .padding(.horizontal)
+                .padding(.horizontal, 24)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 40)
     }
 
     // MARK: - Brief Content

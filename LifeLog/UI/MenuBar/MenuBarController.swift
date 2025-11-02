@@ -59,7 +59,14 @@ class MenuBarController: ObservableObject {
                 if popover.isShown {
                     popover.performClose(nil)
                 } else {
+                    // Activate app to make popover focused and ready to receive clicks
+                    NSApp.activate(ignoringOtherApps: true)
                     popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
+
+                    // Ensure the popover window becomes key
+                    DispatchQueue.main.async {
+                        popover.contentViewController?.view.window?.makeKey()
+                    }
                 }
             }
         }

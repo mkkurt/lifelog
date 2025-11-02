@@ -3,195 +3,240 @@ import SwiftUI
 struct SettingsView: View {
     @StateObject private var aiService = AIService.shared
     @StateObject private var screenCapture = ScreenCaptureService.shared
+    @Environment(\.dismiss) private var dismiss
 
     @State private var apiKey: String = ""
     @State private var captureInterval: Double = 10.0
     @State private var onlyCaptureOnChange: Bool = true
     @State private var pauseWhenLocked: Bool = true
     @State private var excludedApps: String = ""
-    @State private var selectedBackend: AIBackend = .appleIntelligence
+    @State private var selectedBackend: AIBackend = .gemini
 
     var body: some View {
-        TabView {
-            generalSettings
-                .tabItem {
-                    Label("General", systemImage: "gear")
-                }
+        VStack(spacing: 0) {
+            // Header with close button
+            HStack {
+                Text("Settings")
+                    .font(.title2)
+                    .fontWeight(.semibold)
 
-            aiSettings
-                .tabItem {
-                    Label("AI", systemImage: "brain.head.profile")
-                }
+                Spacer()
 
-            privacySettings
-                .tabItem {
-                    Label("Privacy", systemImage: "hand.raised")
+                Button(action: { dismiss() }) {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.title2)
+                        .foregroundStyle(.secondary)
                 }
+                .buttonStyle(.plain)
+                .keyboardShortcut(.cancelAction)
+            }
+            .padding()
+            .background(Color(NSColor.controlBackgroundColor))
 
-            aboutView
-                .tabItem {
-                    Label("About", systemImage: "info.circle")
-                }
+            Divider()
+
+            // Tabbed content
+            TabView {
+                generalSettings
+                    .tabItem {
+                        Label("General", systemImage: "gear")
+                    }
+
+                aiSettings
+                    .tabItem {
+                        Label("AI", systemImage: "brain.head.profile")
+                    }
+
+                privacySettings
+                    .tabItem {
+                        Label("Privacy", systemImage: "hand.raised")
+                    }
+
+                aboutView
+                    .tabItem {
+                        Label("About", systemImage: "info.circle")
+                    }
+            }
+            .padding(.top, 8)
         }
-        .frame(width: 500, height: 400)
+        .frame(width: 600, height: 500)
         .onAppear(perform: loadSettings)
     }
 
     // MARK: - General Settings
 
     private var generalSettings: some View {
-        Form {
-            Section("Screen Capture") {
-                HStack {
-                    Text("Capture interval:")
-                    Spacer()
-                    TextField("Seconds", value: $captureInterval, format: .number)
-                        .frame(width: 60)
-                        .onChange(of: captureInterval) { _, newValue in
-                            saveCaptureInterval(newValue)
+        ScrollView {
+            Form {
+                Section("Screen Capture") {
+                    HStack {
+                        Text("Capture interval:")
+                        Spacer()
+                        TextField("Seconds", value: $captureInterval, format: .number)
+                            .frame(width: 60)
+                            .textFieldStyle(.roundedBorder)
+                            .onChange(of: captureInterval) { _, newValue in
+                                saveCaptureInterval(newValue)
+                            }
+                        Text("seconds")
+                    }
+
+                    Toggle("Only capture on screen change", isOn: $onlyCaptureOnChange)
+                        .onChange(of: onlyCaptureOnChange) { _, newValue in
+                            UserDefaults.standard.set(newValue, forKey: "only_capture_on_change")
                         }
-                    Text("seconds")
+
+                    Toggle("Pause when screen is locked", isOn: $pauseWhenLocked)
+                        .onChange(of: pauseWhenLocked) { _, newValue in
+                            UserDefaults.standard.set(newValue, forKey: "pause_when_locked")
+                        }
                 }
 
-                Toggle("Only capture on screen change", isOn: $onlyCaptureOnChange)
-                    .onChange(of: onlyCaptureOnChange) { _, newValue in
-                        UserDefaults.standard.set(newValue, forKey: "only_capture_on_change")
+                Section("Performance") {
+                    HStack {
+                        Text("Memory usage:")
+                        Spacer()
+                        Text(String(format: "%.1f MB", PerformanceMonitor.shared.memoryUsage))
+                            .foregroundColor(.secondary)
                     }
 
-                Toggle("Pause when screen is locked", isOn: $pauseWhenLocked)
-                    .onChange(of: pauseWhenLocked) { _, newValue in
-                        UserDefaults.standard.set(newValue, forKey: "pause_when_locked")
+                    HStack {
+                        Text("Captures/min:")
+                        Spacer()
+                        Text("\(PerformanceMonitor.shared.capturesPerMinute)")
+                            .foregroundColor(.secondary)
                     }
-            }
-
-            Section("Performance") {
-                HStack {
-                    Text("Memory usage:")
-                    Spacer()
-                    Text(String(format: "%.1f MB", PerformanceMonitor.shared.memoryUsage))
-                        .foregroundColor(.secondary)
-                }
-
-                HStack {
-                    Text("Captures/min:")
-                    Spacer()
-                    Text("\(PerformanceMonitor.shared.capturesPerMinute)")
-                        .foregroundColor(.secondary)
                 }
             }
+            .formStyle(.grouped)
+            .padding()
         }
-        .padding()
     }
 
     // MARK: - AI Settings
 
     private var aiSettings: some View {
-        Form {
-            Section("AI Backend") {
-                Picker("Backend:", selection: $selectedBackend) {
-                    ForEach(AIBackend.allCases, id: \.self) { backend in
-                        Text(backend.rawValue).tag(backend)
-                    }
-                }
-                .pickerStyle(.segmented)
-                .onChange(of: selectedBackend) { _, newValue in
-                    aiService.setPreferredBackend(newValue)
-                }
-
-                if selectedBackend == .appleIntelligence {
-                    if aiService.isAppleIntelligenceAvailable() {
-                        HStack {
-                            Image(systemName: "checkmark.circle.fill")
-                                .foregroundColor(.green)
-                            Text("Apple Intelligence is available")
-                                .foregroundColor(.secondary)
+        ScrollView {
+            Form {
+                Section("AI Backend") {
+                    Picker("Backend:", selection: $selectedBackend) {
+                        ForEach(AIBackend.allCases, id: \.self) { backend in
+                            Text(backend.rawValue).tag(backend)
                         }
-                        .font(.caption)
+                    }
+                    .pickerStyle(.segmented)
+                    .onChange(of: selectedBackend) { _, newValue in
+                        aiService.setPreferredBackend(newValue)
+                    }
+
+                    if selectedBackend == .appleIntelligence {
+                        if aiService.isAppleIntelligenceAvailable() {
+                            HStack(spacing: 6) {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .foregroundColor(.green)
+                                Text("Apple Intelligence is available")
+                                    .foregroundColor(.secondary)
+                            }
+                            .font(.caption)
+                        } else {
+                            HStack(spacing: 6) {
+                                Image(systemName: "xmark.circle.fill")
+                                    .foregroundColor(.orange)
+                                Text("Apple Intelligence requires macOS 26+")
+                                    .foregroundColor(.secondary)
+                            }
+                            .font(.caption)
+                        }
                     } else {
-                        HStack {
-                            Image(systemName: "xmark.circle.fill")
-                                .foregroundColor(.orange)
-                            Text("Apple Intelligence requires macOS 26+")
-                                .foregroundColor(.secondary)
-                        }
-                        .font(.caption)
+                        Text("Using cloud-based Gemini 2.5 Flash model")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
                     }
-                } else {
-                    Text("Using cloud-based Gemini 2.5 Flash model")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
                 }
-            }
 
-            if selectedBackend == .gemini {
-                Section("Gemini API") {
-                    SecureField("API Key", text: $apiKey)
-                        .textFieldStyle(.roundedBorder)
+                if selectedBackend == .gemini {
+                    Section("Gemini API") {
+                        SecureField("API Key", text: $apiKey)
+                            .textFieldStyle(.roundedBorder)
 
-                    Text("Get your API key from [Google AI Studio](https://makersuite.google.com/app/apikey)")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                        Text("Get your API key from [Google AI Studio](https://makersuite.google.com/app/apikey)")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
 
-                    Button("Save API Key") {
-                        aiService.setAPIKey(apiKey)
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .disabled(apiKey.isEmpty)
-
-                    if aiService.hasAPIKey() {
                         HStack {
-                            Image(systemName: "checkmark.circle.fill")
-                                .foregroundColor(.green)
-                            Text("API key configured")
-                                .foregroundColor(.secondary)
+                            Spacer()
+                            Button("Save API Key") {
+                                aiService.setAPIKey(apiKey)
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .disabled(apiKey.isEmpty)
                         }
-                        .font(.caption)
+
+                        if aiService.hasAPIKey() {
+                            HStack(spacing: 6) {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .foregroundColor(.green)
+                                Text("API key configured")
+                                    .foregroundColor(.secondary)
+                            }
+                            .font(.caption)
+                        }
                     }
                 }
             }
+            .formStyle(.grouped)
+            .padding()
         }
-        .padding()
     }
 
     // MARK: - Privacy Settings
 
     private var privacySettings: some View {
-        Form {
-            Section("Excluded Apps") {
-                Text("Apps to exclude from screen capture:")
-                    .font(.headline)
+        ScrollView {
+            Form {
+                Section("Excluded Apps") {
+                    Text("Apps to exclude from screen capture:")
+                        .font(.subheadline)
+                        .fontWeight(.medium)
 
-                TextEditor(text: $excludedApps)
-                    .frame(height: 100)
-                    .border(Color.gray.opacity(0.3))
+                    TextEditor(text: $excludedApps)
+                        .frame(height: 100)
+                        .border(Color.gray.opacity(0.2), width: 1)
+                        .cornerRadius(4)
 
-                Text("One app name per line (e.g., '1Password')")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
+                    Text("One app name per line (e.g., '1Password')")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
 
-            Section("Data Management") {
-                HStack {
-                    Button("View Database Location") {
-                        showInFinder()
+                Section("Data Management") {
+                    VStack(spacing: 8) {
+                        Button("View Database Location") {
+                            showInFinder()
+                        }
+                        .buttonStyle(.bordered)
+                        .frame(maxWidth: .infinity)
+
+                        Button("Clear All Data") {
+                            clearData()
+                        }
+                        .buttonStyle(.bordered)
+                        .foregroundColor(.red)
+                        .frame(maxWidth: .infinity)
                     }
+                }
 
-                    Spacer()
-
-                    Button("Clear All Data") {
-                        clearData()
+                Section("Permissions") {
+                    Button("Open Screen Recording Settings") {
+                        PrivacyManager.shared.openScreenRecordingSettings()
                     }
-                    .foregroundColor(.red)
+                    .buttonStyle(.bordered)
+                    .frame(maxWidth: .infinity)
                 }
             }
-
-            Section("Permissions") {
-                Button("Open Screen Recording Settings") {
-                    PrivacyManager.shared.openScreenRecordingSettings()
-                }
-            }
+            .formStyle(.grouped)
+            .padding()
         }
-        .padding()
     }
 
     // MARK: - About

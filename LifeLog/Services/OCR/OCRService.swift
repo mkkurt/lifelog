@@ -13,7 +13,7 @@ class OCRService: ObservableObject {
 
     private let processingQueue = DispatchQueue(label: "com.lifelog.ocr", qos: .utility)
     private let maxConcurrentOCR = 2
-    private var semaphore: DispatchSemaphore
+    nonisolated private let semaphore: DispatchSemaphore
 
     private init() {
         self.semaphore = DispatchSemaphore(value: maxConcurrentOCR)
@@ -42,9 +42,10 @@ class OCRService: ObservableObject {
 
                 self?.performOCR(on: image, capture: capture, context: context) { result in
                     let processingTime = Date().timeIntervalSince(startTime)
-                    PerformanceMonitor.shared.recordOCRTime(processingTime)
 
                     Task { @MainActor in
+                        PerformanceMonitor.shared.recordOCRTime(processingTime)
+
                         switch result {
                         case .success(let ocrResults):
                             Logger.log("OCR found \(ocrResults.count) text regions in \(String(format: "%.2f", processingTime))s", log: Logger.ocr, type: .debug)
@@ -65,7 +66,7 @@ class OCRService: ObservableObject {
 
     // MARK: - Private Methods
 
-    private func performOCR(
+    nonisolated private func performOCR(
         on image: CGImage,
         capture: Capture,
         context: CaptureContext,
