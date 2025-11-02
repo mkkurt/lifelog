@@ -148,22 +148,26 @@ class MeaningEngine: ObservableObject {
             return nil
         }
 
+        // Sort features by timestamp for proper block counting
+        let sortedFeatures = features.sorted { $0.windowStart < $1.windowStart }
+
         // Calculate focus ratio (deep work time / total active time)
-        let deepWorkFeatures = features.filter { $0.flowIndicator > 0.6 }
-        let totalActiveTime = Double(features.count) * 300 // 5 min per window
+        let deepWorkFeatures = sortedFeatures.filter { $0.flowIndicator > 0.6 }
+        let totalActiveTime = Double(sortedFeatures.count) * 300 // 5 min per window
         let deepWorkTime = Double(deepWorkFeatures.count) * 300
         let focusRatio = totalActiveTime > 0 ? deepWorkTime / totalActiveTime : 0
 
-        // Calculate switches per hour
-        let totalSwitches = features.map { $0.taskSwitchRate }.reduce(0, +)
-        let hours = totalActiveTime / 3600
-        let switchesPerHour = hours > 0 ? totalSwitches / hours : 0
+        // Calculate switches per hour (average across all windows)
+        // taskSwitchRate is already per-hour, so we average them
+        let switchRates = sortedFeatures.map { $0.taskSwitchRate }
+        let switchesPerHour = switchRates.isEmpty ? 0 : switchRates.reduce(0, +) / Double(switchRates.count)
 
         // Calculate topic entropy (Shannon entropy)
-        let topicEntropy = calculateTopicEntropy(features: features)
+        let topicEntropy = calculateTopicEntropy(features: sortedFeatures)
 
-        // Calculate output density
-        let totalOutput = features.map { $0.outputDensity }.reduce(0, +)
+        // Calculate output density (average output per hour)
+        let totalOutput = sortedFeatures.map { $0.outputDensity }.reduce(0, +)
+        let hours = totalActiveTime / 3600
         let outputDensity = hours > 0 ? totalOutput / hours : 0
 
         // Calculate exploration/production ratio
@@ -172,11 +176,11 @@ class MeaningEngine: ObservableObject {
         let explorationProductionRatio = totalActive > 0 ? totalPassive / totalActive : 0
 
         // Calculate stuck score
-        let stuckFeatures = features.filter { $0.repetitionScore > 0.7 && $0.outputDensity < 0.3 }
-        let stuckScore = Double(stuckFeatures.count) / Double(features.count)
+        let stuckFeatures = sortedFeatures.filter { $0.repetitionScore > 0.7 && $0.outputDensity < 0.3 }
+        let stuckScore = Double(stuckFeatures.count) / Double(sortedFeatures.count)
 
-        // Count deep blocks
-        let deepBlocksCount = deepWorkFeatures.count
+        // Count deep blocks (continuous periods of deep work)
+        let deepBlocksCount = countDeepWorkBlocks(features: sortedFeatures)
 
         let metrics = DailyMetrics(
             date: date,
@@ -194,6 +198,29 @@ class MeaningEngine: ObservableObject {
         _ = await StorageService.shared.saveDailyMetrics(metrics)
 
         return metrics
+    }
+
+    /// Count continuous deep work blocks (consecutive windows with flow > 0.6)
+    private func countDeepWorkBlocks(features: [Feature]) -> Int {
+        guard !features.isEmpty else { return 0 }
+
+        var blockCount = 0
+        var inDeepBlock = false
+
+        for feature in features {
+            let isDeepWork = feature.flowIndicator > 0.6
+
+            if isDeepWork && !inDeepBlock {
+                // Starting a new deep work block
+                blockCount += 1
+                inDeepBlock = true
+            } else if !isDeepWork {
+                // Ending the current block
+                inDeepBlock = false
+            }
+        }
+
+        return blockCount
     }
 
     private func calculateTopicEntropy(features: [Feature]) -> Double {
